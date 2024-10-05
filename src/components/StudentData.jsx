@@ -8,13 +8,29 @@ import {
   TableRow,
   Paper,
   Button,
+  Typography,
 } from "@mui/material";
 
 const StudentData = ({ studentDetails, deleteStudent, editStudent }) => {
   return (
-    <TableContainer component={Paper} style={{ marginTop: "20px" }}>
+    <TableContainer
+      component={Paper}
+      sx={{
+        marginTop: "20px",
+        width: "100%",
+        border: "1px solid #ccc",
+        padding: "10px",
+      }}
+    >
       <Table>
         <TableHead>
+          <TableRow>
+            <TableCell colSpan={3}>
+              <Typography variant="h6" align="center">
+                Student Data
+              </Typography>
+            </TableCell>
+          </TableRow>
           <TableRow>
             <TableCell>ID</TableCell>
             <TableCell>Name</TableCell>
@@ -32,7 +48,7 @@ const StudentData = ({ studentDetails, deleteStudent, editStudent }) => {
                     variant="contained"
                     color="primary"
                     onClick={() => editStudent(student.id)}
-                    style={{ marginRight: "10px" }}
+                    sx={{ marginRight: "10px" }}
                   >
                     Edit
                   </Button>
