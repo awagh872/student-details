@@ -12,6 +12,12 @@ import {
 } from "@mui/material";
 
 const StudentData = ({ studentDetails, deleteStudent, editStudent }) => {
+  const ActionButton = ({ onClick, label, color }) => (
+    <Button variant="contained" color={color} onClick={onClick} sx={{ marginRight: "10px" }}>
+      {label}
+    </Button>
+  );
+
   return (
     <TableContainer
       component={Paper}
@@ -22,55 +28,48 @@ const StudentData = ({ studentDetails, deleteStudent, editStudent }) => {
         padding: "10px",
       }}
     >
-      <Table>
-        <TableHead>
-          <TableRow>
-            <TableCell colSpan={3}>
-              <Typography variant="h6" align="center">
-                Student Data
-              </Typography>
-            </TableCell>
-          </TableRow>
-          <TableRow>
-            <TableCell>ID</TableCell>
-            <TableCell>Name</TableCell>
-            <TableCell align="right">Actions</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {studentDetails.length > 0 ? (
-            studentDetails.map((student) => (
+      {studentDetails.length === 0 ? (
+        <Typography variant="h6" align="center">
+          No student data available. To add data, please enter a text and click on the submit button.
+        </Typography>
+      ) : (
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell colSpan={3}>
+                <Typography variant="h6" align="center">
+                  Student Data
+                </Typography>
+              </TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>ID</TableCell>
+              <TableCell>Name</TableCell>
+              <TableCell align="right">Actions</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {studentDetails.map((student) => (
               <TableRow key={student.id}>
                 <TableCell>{student.id}</TableCell>
                 <TableCell>{student.name}</TableCell>
                 <TableCell align="right">
-                  <Button
-                    variant="contained"
-                    color="primary"
+                  <ActionButton
                     onClick={() => editStudent(student.id)}
-                    sx={{ marginRight: "10px" }}
-                  >
-                    Edit
-                  </Button>
-                  <Button
-                    variant="contained"
-                    color="secondary"
+                    label="Edit"
+                    color="primary"
+                  />
+                  <ActionButton
                     onClick={() => deleteStudent(student.id)}
-                  >
-                    Delete
-                  </Button>
+                    label="Delete"
+                    color="secondary"
+                  />
                 </TableCell>
               </TableRow>
-            ))
-          ) : (
-            <TableRow>
-              <TableCell colSpan={3} align="center">
-                No student data available
-              </TableCell>
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
+            ))}
+          </TableBody>
+        </Table>
+      )}
     </TableContainer>
   );
 };

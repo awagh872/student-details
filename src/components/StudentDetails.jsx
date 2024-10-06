@@ -1,49 +1,61 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import Paper from "@mui/material/Paper";
+import Typography from "@mui/material/Typography";
 import StudentData from "./StudentData";
 
 const StudentDetails = () => {
-  const [name, setName] = useState("");
-  const [details, setDetails] = useState([]);
-  const [editId, setEditId] = useState(null);
-  const [error, setError] = useState(false);
+  const [studentName, setStudentName] = useState("");
+  const [studentDetails, setStudentDetails] = useState([]);
+  const [editingStudentId, setEditingStudentId] = useState(null);
+  const [errorMsg, setErrorMsg] = useState("");
 
-  const addOrUpdateName = () => {
-    if (name.trim() === "") {
-      setError(true);
+  const handleNameChange = (e) => {
+    setStudentName(e.target.value);
+    if (errorMsg) setErrorMsg("");
+  };
+
+  const handleFormSubmit = () => {
+    if (!studentName.trim()) {
+      setErrorMsg("Name cannot be empty");
       return;
     }
-    setError(false);
 
-    if (editId) {
-      const updatedDetails = details.map((student) =>
-        student.id === editId ? { ...student, name } : student
+    if (editingStudentId) {
+      const updatedDetails = studentDetails.map((student) =>
+        student.id === editingStudentId ? { ...student, name: studentName } : student
       );
-      setDetails(updatedDetails);
-      setEditId(null);
+      setStudentDetails(updatedDetails);
+      setEditingStudentId(null);
     } else {
-      const newStudentDetails = {
+      const newStudent = {
         id: new Date().getTime(),
-        name,
+        name: studentName,
       };
-      setDetails([...details, newStudentDetails]);
+      setStudentDetails((prevDetails) => [...prevDetails, newStudent]);
     }
-    setName("");
+    setStudentName("");
   };
-  const deleteStudent = (id) => {
-    const filteredDetails = details.filter((student) => student.id !== id);
-    setDetails(filteredDetails);
-  };
-  const editStudent = (id) => {
-    const studentToEdit = details.find((student) => student.id === id);
-    if (studentToEdit) {
-      setName(studentToEdit.name);
-      setEditId(id);
-    }
-  };
+
+  const deleteStudent = useCallback((id) => {
+    setStudentDetails((prevDetails) =>
+      prevDetails.filter((student) => student.id !== id)
+    );
+  }, []);
+
+  const editStudent = useCallback(
+    (id) => {
+      const studentToEdit = studentDetails.find((student) => student.id === id);
+      if (studentToEdit) {
+        setStudentName(studentToEdit.name);
+        setEditingStudentId(id);
+      }
+    },
+    [studentDetails]
+  );
+
   return (
     <Box
       display="flex"
@@ -54,7 +66,9 @@ const StudentDetails = () => {
     >
       <Box sx={{ width: "50%" }}>
         <Paper sx={{ padding: 2, border: "1px solid #ccc", borderRadius: 1 }}>
-          <h2>Student Details Form</h2>
+          <Typography variant="h5" align="center" gutterBottom>
+            {editingStudentId ? "Edit Student Details" : "Student Details Form"}
+          </Typography>
           <Box
             component="form"
             sx={{
@@ -69,35 +83,27 @@ const StudentDetails = () => {
               id="firstName"
               label="First Name"
               variant="outlined"
-              value={name}
-              error={error}
-              helperText={error ? "Name cannot be empty" : ""}
-              onChange={(e) => setName(e.target.value)}
+              value={studentName}
+              error={!!errorMsg}
+              helperText={errorMsg}
+              onChange={handleNameChange}
             />
           </Box>
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "center",
-              marginTop: "20px",
-            }}
-          >
-            <Button variant="contained" onClick={addOrUpdateName}>
-              {editId ? "Update" : "Submit"}
+          <Box sx={{ display: "flex", justifyContent: "center", marginTop: "20px" }}>
+            <Button variant="contained" onClick={handleFormSubmit}>
+              {editingStudentId ? "Update" : "Submit"}
             </Button>
           </Box>
         </Paper>
       </Box>
 
-      {details.length > 0 && (
-        <Box sx={{ marginTop: "20px", width: "50%" }}>
-          <StudentData
-            studentDetails={details}
-            deleteStudent={deleteStudent}
-            editStudent={editStudent}
-          />
-        </Box>
-      )}
+      <Box sx={{ marginTop: "20px", width: "50%" }}>
+        <StudentData
+          studentDetails={studentDetails}
+          deleteStudent={deleteStudent}
+          editStudent={editStudent}
+        />
+      </Box>
     </Box>
   );
 };
